@@ -1,0 +1,9 @@
+#! /usr/bin/env zsh
+
+root_dir=${0:a:h:h}
+
+: ${RIG_NVIM_BIN:=$(which nvim)}
+: ${RIG_NVIM_FENNEL_BIN:="$root_dir/lib/fennel"}
+
+
+exec $RIG_NVIM_BIN -l $RIG_NVIM_FENNEL_BIN $@
