@@ -1,6 +1,7 @@
 (local bootstrap (require :rig.bootstrap))
 
 (fn setup []
-  (bootstrap.greet))
+  (bootstrap.inject-fennel-loader)
+  (bootstrap.enable-fennel))
 
 {: setup}

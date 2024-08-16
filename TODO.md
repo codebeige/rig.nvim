@@ -1,10 +1,10 @@
 # TODO
 
 * [X] Set up LICENSE and README
-* [ ] provide default fennel version
+* [X] provide default fennel version
+* [X] configure fennel version via env
 * [ ] inject fennel loader
 * [ ] inject custom loader for rtp
-* [ ] configure fennel version via env
 * [ ] cache compiled lua modules
 * [ ] add docs on installation and usage
 * [ ] ignore cache in dev-mode?

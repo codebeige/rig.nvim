@@ -6,6 +6,7 @@ root_dir=${0:a:h:h}
 # see https://github.com/neovim/neovim/issues/27084
 output=$($root_dir/bin/fennel \
   --require-as-include \
+  --skip-include fennel \
   --add-fennel-path "$root_dir/fnl/?.fnl;$root_dir/fnl/?/init.fnl" \
   --compile $@ 2>&1)
 

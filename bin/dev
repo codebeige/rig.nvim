@@ -1,13 +1,13 @@
 #! /usr/bin/env zsh
 
-: ${RIG_NVIM_BIN:=$(which nvim)}
-: ${RIG_NVIM_FENNEL:=$root_dir/lib/fennel.lua}
-: ${RIG_NVIM_FENNEL_BIN:=$root_dir/lib/fennel}
-
 root_dir=${0:a:h:h}
 tmp_dir=$root_dir/tmp
 pipe=$tmp_dir/nvim.dev.pipe
 dev_dir=$root_dir/dev
+
+: ${RIG_NVIM_BIN:=$(which nvim)}
+: ${RIG_NVIM_FENNEL:=$root_dir/lib/fennel.lua}
+: ${RIG_NVIM_FENNEL_BIN:=$root_dir/lib/fennel}
 
 if [[ -a $pipe ]]; then
   echo "Error: dev environment already running at $pipe"
@@ -19,10 +19,11 @@ mkdir -p $tmp_dir
 RIG_NVIM_BIN=$RIG_NVIM_BIN \
 RIG_NVIM_FENNEL=$RIG_NVIM_FENNEL \
 RIG_NVIM_FENNEL_BIN=$RIG_NVIM_FENNEL_BIN \
-LUA_PATH="$root_dir/lua/?.lua;$root_dir/lua/?/init.lua;;"
+LUA_PATH="$root_dir/lua/?.lua;$root_dir/lua/?/init.lua;;" \
   exec $RIG_NVIM_BIN \
   --clean \
   --listen $pipe \
   --cmd "cd $dev_dir" \
+  --cmd "set runtimepath+=$root_dir" \
   -u $dev_dir/init.lua \
   $@
