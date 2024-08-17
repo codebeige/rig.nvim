@@ -3,7 +3,7 @@
 * [X] Set up LICENSE and README
 * [X] provide default fennel version
 * [X] configure fennel version via env
-* [ ] inject fennel loader
+* [X] inject fennel's package loader
 * [ ] inject custom loader for rtp
 * [ ] cache compiled lua modules
 * [ ] add docs on installation and usage

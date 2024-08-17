@@ -5,9 +5,10 @@
       (set package.preload.fennel (loadfile fennel-src)))))
 
 (fn enable-fennel []
+  (vim.loader.enable)
   (let [fennel (require :fennel)]
-    (print fennel.version)
-    ; TODO: inject module loaders
+    (table.insert package.loaders 2 fennel.searcher)
+    ; TODO: inject rtp module loader
     ))
 
 {: enable-fennel
