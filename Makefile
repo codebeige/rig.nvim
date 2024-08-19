@@ -8,5 +8,5 @@ clean:
 lua:
 	mkdir lua
 
-lua/rig.lua: fnl/rig.fnl fnl/rig/bootstrap.fnl lua
+lua/rig.lua: src/rig.fnl lua
 	bin/compile $< > $@
