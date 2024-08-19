@@ -15,11 +15,31 @@
                 (vim.fn.globpath vim.o.runtimepath "lib/fennel.lua"))]
     (dofile src)))
 
+(local dir-separator (package.config:sub 1 1))
+(local fennel-dir "fnl")
+
+(fn module-path [module-name]
+  (let [fragments (vim.split module-name "." {:plain true})]
+    (table.insert fragments 1 fennel-dir)
+    (table.concat fragments dir-separator)))
+
+(fn rtp-file [path]
+  (case (vim.fn.globpath vim.o.runtimepath path false true)
+    [f] f))
+
+(fn rtp-searcher [module-name]
+  (let [p (module-path module-name)]
+    (case (or (rtp-file (.. p ".fnl"))
+              (rtp-file (.. p dir-separator "init.fnl")))
+      f #(let [fennel (require :fennel)]
+           (fennel.dofile f)))))
+
 (fn setup []
   (vim.loader.enable)
   (when (not package.preload.fennel)
     (set package.preload.fennel load-fennel))
   (let [fennel (require :fennel)]
-    (insert! package.loaders 2 fennel.searcher)))
+    (insert! package.loaders 2 rtp-searcher)
+    (insert! package.loaders 3 fennel.searcher)))
 
 {: setup}
