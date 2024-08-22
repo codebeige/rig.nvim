@@ -1,6 +1,7 @@
 build: lua/rig.lua
 
 clean:
+	rm -rf tmp
 	rm -rf lua
 
 .PHONY: build clean

@@ -10,27 +10,26 @@
   (while (remove! xs x))
   (table.insert xs i x))
 
-(fn load-fennel []
-  (let [src (or vim.env.RIG_NVIM_FENNEL
-                (vim.fn.globpath vim.o.runtimepath "lib/fennel.lua"))]
-    (dofile src)))
+(local src (-> (debug.getinfo 1) (. :source) (vim.fs.root :Makefile)))
+(local path (partial vim.fs.joinpath src))
 
-(local dir-separator (package.config:sub 1 1))
-(local fennel-dir "fnl")
+(fn load-fennel []
+  (let [src (or vim.env.RIG_NVIM_FENNEL (path "lib/fennel.lua"))]
+    (dofile src)))
 
 (fn module-path [module-name]
   (let [fragments (vim.split module-name "." {:plain true})]
-    (table.insert fragments 1 fennel-dir)
-    (table.concat fragments dir-separator)))
+    (vim.fs.joinpath "fnl" (unpack fragments))))
 
 (fn rtp-file [path]
+  (vim.print "RTP" path)
   (case (vim.fn.globpath vim.o.runtimepath path false true)
-    [f] f))
+    [f] (doto f (vim.print))))
 
 (fn rtp-searcher [module-name]
   (let [p (module-path module-name)]
     (case (or (rtp-file (.. p ".fnl"))
-              (rtp-file (.. p dir-separator "init.fnl")))
+              (rtp-file (vim.fs.joinpath p "init.fnl")))
       f #(let [fennel (require :fennel)]
            (fennel.dofile f)))))
 
