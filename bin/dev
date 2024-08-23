@@ -24,6 +24,6 @@ LUA_PATH="$root_dir/lua/?.lua;$root_dir/lua/?/init.lua;;" \
   --clean \
   --listen $pipe \
   --cmd "cd $dev_dir" \
-  --cmd "set runtimepath+=$root_dir/runtime" \
+  --cmd "set runtimepath+=$dev_dir/runtime" \
   -u $dev_dir/init.lua \
   $@
