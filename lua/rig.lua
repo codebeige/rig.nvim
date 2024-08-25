@@ -39,11 +39,13 @@ end
 local function setup()
   local fennel = require_fennel(vim.env.RIG_NVIM_FENNEL)
   insert_at(package.loaders, 2, fennel.searcher)
-  fennel.path = prepend(
-    fennel.path,
+  local plugin_paths = {
     vim.fs.joinpath(root_dir, "fnl", "?.fnl"),
-    vim.fs.joinpath(root_dir, "fnl", "?", "init.fnl")
-  )
+    vim.fs.joinpath(root_dir, "fnl", "?", "init.fnl"),
+  }
+  for _, k in pairs({"path", "macro-path"}) do
+    fennel[k] = prepend(fennel[k], unpack(plugin_paths))
+  end
   require("rig.runtime").install()
 end
 

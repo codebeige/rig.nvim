@@ -21,6 +21,22 @@
   (table.insert xs i x)
   xs)
 
-{: index-of
+(fn append! [xs x]
+  "Insert item x after last item in sequence xs.
+
+  Ensures that x is present exactly once as the last item. All other occurences
+  are removed. Returns sequence xs for chaining."
+  (insert-at! xs (+ 1 (length xs)) x))
+
+(fn prepend! [xs x]
+  "Insert item x at beginning of sequence xs.
+
+  Ensures that x is present exactly once as the first item. All other
+  occurences are removed. Returns sequence xs for chaining."
+  (insert-at! xs 1 x))
+
+{: append!
+ : index-of
  : insert-at!
+ : prepend!
  : remove!}

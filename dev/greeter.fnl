@@ -1,4 +1,6 @@
+(import-macros {: p} :rig.macros)
+
 (fn greet [name]
-  (print (.. "Hello " name "! Enjoy fennel inside nvim...")))
+  (print (.. "Hello " (p name) "! Enjoy fennel inside nvim...")))
 
 {: greet}
