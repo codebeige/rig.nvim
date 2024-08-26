@@ -1,5 +1,4 @@
 (local fennel (require :fennel))
-(local utils (require :fennel.utils))
 (local {: insert-at! : prepend!} (require :rig.sequence))
 
 (fn module-path [module-name]
@@ -21,18 +20,11 @@
       f (values #(fennel.dofile f) f)
       (nil err) err)))
 
-(fn make-compiler-opts [module-name]
-  (doto (utils.copy utils.root.options)
-    (tset :module-name module-name)
-    (tset :env :_COMPILER)
-    (tset :requireAsInclude false)
-    (tset :allowedGlobals nil)))
-
 (fn rtp-macro-searcher [module-name]
   (let [p (module-path module-name)]
     (case (find (.. p ".fnl")
                 (vim.fs.joinpath p "init.fnl"))
-      f (values #(fennel.dofile f (make-compiler-opts module-name)) f))))
+      f (values #(fennel.dofile f {: module-name :env :_COMPILER}) f))))
 
 (fn install []
   "Insert nvim runtimepath searchers into package.loaders table.
