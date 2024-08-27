@@ -38,24 +38,35 @@ end
 local path_separator = package.config:sub(3, 3)
 
 local function prepend(path, ...)
-  local path_ = path
-  for _, fragment in pairs({...}) do
-    path_ = path_:gsub(fragment .. path_separator, "", 1, true)
-    path_ = path_:gsub(path_separator .. fragment, "", 1, true)
+  local fragments = vim.split(path, path_separator)
+  local index = {}
+  for i, p in ipairs({...}) do
+    index[p] = i
   end
-  return table.concat({...}, path_separator) .. path_separator .. path_
+  local path_ = table.concat({...}, path_separator)
+  for _,  fragment in ipairs(fragments) do
+    if not index[fragment] then
+      path_ = path_ .. path_separator .. fragment
+    end
+  end
+  return path_
 end
 
 local function setup()
+  vim.loader.enable()
   local fennel = require_fennel(vim.env.RIG_NVIM_FENNEL)
   insert_at(package.loaders, 2, fennel.searcher)
-  local plugin_paths = {
+  fennel.path = prepend(
+    fennel.path,
+    plugin_path("fnl", "?.fnl"),
+    plugin_path("fnl", "?", "init.fnl")
+  )
+  fennel["macro-path"] = prepend(
+    fennel["macro-path"],
     plugin_path("fnl", "?.fnl"),
     plugin_path("fnl", "?", "init.fnl"),
-  }
-  for _, k in pairs({"path", "macro-path"}) do
-    fennel[k] = prepend(fennel[k], unpack(plugin_paths))
-  end
+    plugin_path("fnl", "?", "init-macros.fnl")
+  )
   require("rig.runtime").install()
 end
 

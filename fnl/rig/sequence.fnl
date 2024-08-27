@@ -35,7 +35,12 @@
   occurences are removed. Returns sequence xs for chaining."
   (insert-at! xs 1 x))
 
+(fn filter [xs f]
+  "Return a new sequence with items removed from xs for which (f x) is truthy."
+  (icollect [_ x (ipairs xs)] (if (not (f x)) x)))
+
 {: append!
+ : filter
  : index-of
  : insert-at!
  : prepend!

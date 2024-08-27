@@ -1,7 +1,8 @@
 (local fennel (require :fennel))
 (local view (require :fennel.view))
 (local compiler (require :fennel.compiler))
-(local {: insert-at! : prepend!} (require :rig.sequence))
+(local path (require :rig.path))
+(local seq (require :rig.sequence))
 
 (fn module-path [module-name]
   (let [fragments (vim.split module-name "." {:plain true})]
@@ -90,14 +91,29 @@
                                    :env :_COMPILER})
                 f))))
 
-
 (fn install []
   "Insert nvim runtimepath searchers into package.loaders table.
 
   The operation is idempotent. Previously inserted instances of runtimepath
   searchers are removed before inserting. Returns table package.loaders."
 
-  (insert-at! package.loaders 2 rtp-searcher)
-  (prepend! fennel.macro-searchers rtp-macro-searcher))
+  (set fennel.path
+       (path.prepend fennel.path
+                     (vim.fs.joinpath "." "?.fnl")
+                     (vim.fs.joinpath "." "?" "init.fnl")
+                     (vim.fs.joinpath "." "fnl" "?.fnl")
+                     (vim.fs.joinpath "." "fnl" "?" "init.fnl")))
+
+  (set fennel.macro-path
+       (path.prepend fennel.macro-path
+                     (vim.fs.joinpath "." "?.fnl")
+                     (vim.fs.joinpath "." "?" "init.fnl")
+                     (vim.fs.joinpath "." "?" "init-macros.fnl")
+                     (vim.fs.joinpath "." "fnl" "?.fnl")
+                     (vim.fs.joinpath "." "fnl" "?" "init.fnl")
+                     (vim.fs.joinpath "." "fnl" "?" "init-macros.fnl")))
+
+  (seq.append! fennel.macro-searchers rtp-macro-searcher)
+  (seq.insert-at! package.loaders 5 rtp-searcher))
 
 {: install}
