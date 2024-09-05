@@ -1,4 +1,5 @@
 (local fennel (require :fennel))
+(local cache (require :rig.cache))
 (local path (require :rig.path))
 (local seq (require :rig.sequence))
 (local {: load-in-sandbox} (require :rig.compile))
@@ -19,14 +20,14 @@
   (let [p (module-path module-name)]
     (case (find (.. p ".fnl")
                 (vim.fs.joinpath p "init.fnl"))
-      f (values #(fennel.dofile f) f)
+      f (values (cache.loadfile f) f)
       (nil err) err)))
 
 (fn rtp-macro-searcher [module-name]
   (let [p (module-path module-name)]
     (case (find (.. p ".fnl")
                 (vim.fs.joinpath p "init.fnl"))
-      f (values (load-in-sandbox f module-name) f))))
+      f (values (load-in-sandbox f module-name) f)))) ; TODO: use cache with compiler env
 
 (fn install []
   "Insert nvim runtimepath searchers into package.loaders table.

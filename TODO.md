@@ -5,7 +5,7 @@
 * [X] configure fennel version via env
 * [X] inject fennel's package loader
 * [X] inject custom loader for rtp
-* [ ] cache compiled lua modules
+* [X] cache compiled lua modules
 * [ ] add docs on installation and usage
 * [ ] ignore cache in dev-mode?
 * [ ] support independent development env
