@@ -1,9 +1,10 @@
 (local fennel (require :fennel))
 (local compiler (require :fennel.compiler))
 (local view (require :fennel.view))
+(local specials (require :fennel.specials))
 
 (fn copy [t]
-  (vim.tbl_extend :keep t {}))
+  (collect [k v (pairs t)] k v))
 
 (fn safe-getmetatable [t]
   (let [mt (getmetatable t)
@@ -34,8 +35,7 @@
       (safe-fennel-module module-name)
       (load-macro-module)))
 
-
-(fn make-compiler-sandbox []
+(fn make-sandbox []
   {: _VERSION
    : assert
    : error
@@ -62,9 +62,11 @@
    :string (copy string)
    :table (copy table)})
 
-(fn load-in-sandbox [f module-name]
-  #(fennel.dofile f {: module-name
-                     :env :_COMPILER
-                     :compiler-env (make-compiler-sandbox)}))
+(fn make-env []
+  (specials.make-compiler-env
+    nil
+    compiler.scopes.compiler
+    {}
+    {:compiler-env (make-sandbox)}))
 
-{: load-in-sandbox}
+{: make-env}

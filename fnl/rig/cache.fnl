@@ -1,4 +1,5 @@
 (local fennel (require :fennel))
+(local specials (require :fennel.specials))
 
 (local prefix (vim.fs.joinpath (vim.fn.stdpath :cache) :fnlc))
 
@@ -39,14 +40,15 @@
     (vim.uv.fs_write f* (.. (stat->header stat) (string.dump chunk)))))
 
 (fn loadfile* [f ?env]
-  (let [(cache-path src-path) (src->fnlc f)
+  (let [env (specials.wrap-env (or ?env _G))
+        (cache-path src-path) (src->fnlc f)
         stat (vim.uv.fs_stat src-path)
         chunk-name (.. "@" src-path)]
     (case (read-chunk cache-path stat)
-      c (load c chunk-name :b ?env)
+      c (load c chunk-name :b env)
       _ (-> (read-file src-path stat)
             (fennel.compile-string {:filename src-path})
-            (load chunk-name :t ?env)
+            (load chunk-name :t env)
             (doto (write-chunk cache-path stat))))))
 
 (fn clear []

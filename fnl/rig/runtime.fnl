@@ -1,8 +1,8 @@
 (local fennel (require :fennel))
 (local cache (require :rig.cache))
+(local compiler (require :rig.compiler))
 (local path (require :rig.path))
 (local seq (require :rig.sequence))
-(local {: load-in-sandbox} (require :rig.compile))
 
 (fn module-path [module-name]
   (let [fragments (vim.split module-name "." {:plain true})]
@@ -27,7 +27,7 @@
   (let [p (module-path module-name)]
     (case (find (.. p ".fnl")
                 (vim.fs.joinpath p "init.fnl"))
-      f (values (load-in-sandbox f module-name) f)))) ; TODO: use cache with compiler env
+      f (values (cache.loadfile f (compiler.make-env)) f))))
 
 (fn install []
   "Insert nvim runtimepath searchers into package.loaders table.
