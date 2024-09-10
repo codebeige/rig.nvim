@@ -1,2 +1,3 @@
-lib/*  linguist-vendored
-dev/*  linguist-documentation
+lib/*     linguist-vendored
+dev/*     linguist-documentation
+lua/rig/* linguist-generated

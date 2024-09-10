@@ -1,0 +1,20 @@
+#! /usr/bin/env zsh
+
+root_dir=${0:a:h:h}
+
+# nvim -l always writes to stderr
+# see https://github.com/neovim/neovim/issues/27084
+# output=$(
+  exec $root_dir/bin/fennel \
+    --add-fennel-path "src/?.fnl" \
+    --require-as-include \
+    --skip-include fennel \
+    --compile $@ 2>&1
+# )
+
+# if [[ $output =~ ^[^[:space:]]+:[[:space:]] ]]; then
+#   >&2 echo $output
+#   exit 1
+# else
+#   echo $output
+# fi
