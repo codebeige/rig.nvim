@@ -1,10 +1,9 @@
-(local fennel (require :fennel))
-(local specials (require :fennel.specials))
+(local lazy (require :rig.lazy))
 
 (local prefix (vim.fs.joinpath (vim.fn.stdpath :cache) :fnlc))
 
 (macro with-file-open [[f open] ...]
-  `(let [{:traceback traceback#} (require :fennel)
+  `(let [{:traceback traceback#} (or (?. package.loaded :fennel) debug)
          ,f (assert ,open)]
      ((fn [ok# ...]
         (vim.uv.fs_close ,f)
@@ -39,16 +38,19 @@
   (with-file-open [f* (vim.uv.fs_open f :w mode)]
     (vim.uv.fs_write f* (.. (stat->header stat) (string.dump chunk)))))
 
-(fn loadfile* [f ?env]
-  (let [env (specials.wrap-env (or ?env _G))
-        (cache-path src-path) (src->fnlc f)
+(fn assoc [opts key value]
+  (doto (collect [k v (pairs (or opts {}))] k v)
+    (tset key value)))
+
+(fn loadfile* [f ?opts]
+  (let [(cache-path src-path) (src->fnlc f)
         stat (vim.uv.fs_stat src-path)
-        chunk-name (.. "@" src-path)]
+        chunk-name (.. "@" src-path)
+        opts (assoc ?opts :filename src-path)]
     (case (read-chunk cache-path stat)
-      c (load c chunk-name :b env)
+      c (load c chunk-name :b)
       _ (-> (read-file src-path stat)
-            (fennel.compile-string {:filename src-path})
-            (load chunk-name :t env)
+            (lazy.load opts)
             (doto (write-chunk cache-path stat))))))
 
 (fn clear []
