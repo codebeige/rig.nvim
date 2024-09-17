@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+root_dir=${0:a:h:h}
+
+nvim -l $root_dir/build.lua

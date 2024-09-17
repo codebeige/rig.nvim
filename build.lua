@@ -1,6 +1,7 @@
 local fs = vim.fs
 local uv = vim.uv
 local fn = vim.fn
+
 local dir = fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h")
 local fennel = dofile(fs.joinpath(dir, "lib/fennel.lua"))
 
@@ -32,4 +33,4 @@ function pr(message)
   end
 end
 
-pr("Successfully compiled 'rig.lua'.")
+pr("Successfully compiled '" .. out .. "'.")
