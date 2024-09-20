@@ -2,7 +2,8 @@
 (local seq (require :rig.seq))
 (local {: fennel-searcher
         : rtp-searcher
-        : rtp-macro-searcher} (require :rig.searchers))
+        : rtp-macro-searcher
+        &as searchers} (require :rig.searchers))
 
 (fn find-fennel-src []
   (-> (debug.getinfo 2 :S)
@@ -27,14 +28,17 @@
                         "fnl/?.fnl"
                         "fnl/?/init-macros.fnl"
                         "fnl/?/init.fnl"))
-     (seq.append! fennel.macro-searchers rtp-macro-searcher)
+     (set fennel.macro-searchers
+          (seq.append fennel.macro-searchers rtp-macro-searcher))
      fennel))
 
 (fn setup []
   (vim.loader.enable)
   (when (not package.preload.fennel)
     (set package.preload.fennel (load-fennel vim.env.RIG_NVIM_FENNEL)))
-  (seq.insert-at! package.loaders 5 fennel-searcher)
-  (seq.insert-at! package.loaders 6 rtp-searcher))
+  (set package.loaders
+       (-> package.loaders
+           (searchers.insert 5 fennel-searcher)
+           (searchers.insert 6 rtp-searcher))))
 
 {: setup}

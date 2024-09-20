@@ -35,13 +35,73 @@
   occurences are removed. Returns sequence xs for chaining."
   (insert-at! xs 1 x))
 
-(fn filter [xs f]
-  "Return a new sequence with items removed from xs for which (f x) is truthy."
-  (icollect [_ x (ipairs xs)] (if (not (f x)) x)))
+(fn first [xs]
+  "Return the first item from the sequence xs.
 
-{: append!
+  Returns nil when xs is empty or nil."
+  (. (or xs []) 1))
+
+(fn rest [xs n]
+  "Return a sequence of all remaining items after the first or n items."
+  (icollect [i x (ipairs xs)] (if (< (or n 1) i) x)))
+
+(fn take [xs n]
+  "Create a new sequence of the first n items from the sequence xs."
+  (icollect [i x (ipairs xs)] (if (>= n i) x)))
+
+(fn concat [...]
+  {:fnl/docstring
+   "Create a single sequence from all items in xs, ys, and more.
+
+   Returns an empty sequence when called with no arguments. Returns a copy of
+   xs when called with a single argument."
+   :fnl/arglist [xs ys & more]}
+  (case (values (select :# ...) ...)
+    (0) []
+    (1 xs) (icollect [_ x (ipairs xs)] x)
+    (2 xs ys) (icollect [_ y (ipairs ys) &into (concat xs)] y)
+    (_ xs ys) (concat (concat xs ys) (select 3 ...)))) ; TODO: wrap with tail!
+
+(fn append [xs ...]
+  {:fnl/docstring
+   "Return a sequence with item x (and optionally more) added the end of all
+   items in xs."
+   :fnl/arglist [xs x & more]}
+  (concat xs [...]))
+
+(fn prepend [xs ...]
+  {:fnl/docstring
+   "Return a sequence from item x (and optionally more) followed by all items
+   in xs."
+   :fnl/arglist [xs x & more]}
+  (concat [...] xs))
+
+(fn insert [xs i ...]
+  {:fnl/docstring
+   "Return a sequence with item x (and optionally more) inserted at position i
+   of the sequence xs."
+   :fnl/arglist [xs i x & more]}
+  (let [n (- i 1)]
+    (concat (take xs n) [...] (rest xs n))))
+
+(fn filter [xs f]
+  "Return a new sequence with items from xs for which (f x) is truthy."
+  (icollect [_ x (ipairs xs)] (if (f x) x)))
+
+(fn remove [xs f]
+  "Return a new sequence without items from xs for which (f x) is truthy."
+  (filter xs #(not (f $1))))
+
+{: append
+ : append!
+ : concat
  : filter
+ : first
  : index-of
+ : insert
  : insert-at!
+ : prepend
  : prepend!
- : remove!}
+ : remove
+ : remove!
+ : rest}

@@ -1,5 +1,7 @@
 (local cache (require :rig.cache))
+(local meta-data (require :rig.meta-data))
 (local path (require :rig.path))
+(local seq (require :rig.seq))
 
 (local default-fennel-path
   (path.prepend vim.env.FENNEL_PATH
@@ -39,22 +41,41 @@
                          "fnl/?/init-macros.fnl"
                          "fnl/?/init.fnl"))
 
-(fn fennel-searcher [module-name]
-  (case (find-in-fennel-path module-name)
-    f (values (cache.loadfile f {: module-name}) f)
-    (nil err) err))
+(fn make-fennel-searcher []
+  (doto
+    (fn [module-name]
+      (case (find-in-fennel-path module-name)
+        f (values (cache.loadfile f {: module-name}) f)
+        (nil err) err))
+    (meta-data.set {:type :fennel-searcher})))
 
 
-(fn rtp-searcher [module-name]
-  (case (find-in-runtime-path module-name)
-    f (values (cache.loadfile f {: module-name}) f)
-    (nil err) err))
+(fn make-rtp-searcher []
+  (doto
+    (fn [module-name]
+      (case (find-in-runtime-path module-name)
+        f (values (cache.loadfile f {: module-name}) f)
+        (nil err) err))
+    (meta-data.set {:type :rtp-searcher})))
 
-(fn rtp-macro-searcher [module-name]
-  (case (find-macro-in-runtime-path module-name)
-    f (values (cache.loadfile f {: module-name :env :_COMPILER}) f)
-    (nil err) err))
+(fn make-rtp-macro-searcher []
+  (doto
+    (fn [module-name]
+      (case (find-macro-in-runtime-path module-name)
+        f (values (cache.loadfile f {: module-name :env :_COMPILER}) f)
+        (nil err) err))
+    (meta-data.set {:type :rtp-macro-searcher})))
 
-{: fennel-searcher
- : rtp-searcher
- : rtp-macro-searcher}
+(fn type* [f]
+  (?. (meta-data.get f) :type))
+
+(fn insert [xs i x]
+  (let [t (type* x)]
+    (-> xs
+        (seq.remove #(= t (type* $1)))
+        (seq.insert i x))))
+
+{:fennel-searcher (make-fennel-searcher)
+ : insert
+ :rtp-searcher (make-rtp-searcher)
+ :rtp-macro-searcher (make-rtp-macro-searcher)}
