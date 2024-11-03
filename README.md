@@ -38,31 +38,39 @@ but this is *not* a requirement.
 function fetch(repo, path)
   local url = "https://github.com/" .. repo .. ".git"
   if not vim.loop.fs_stat(path) then
-    print("Fetching '" .. url .. "'...")
-    vim.fn.system({
+    print("Fetching " .. url .. "...")
+    local result = vim.system(
+      {
         "git",
         "clone",
         "--filter=blob:none",
-        url,
         "--branch=stable",
+        url,
         path,
-    })
-    print("Successfully installed " .. repo .. " at " .. path .. ".")
+      }, { text = true }
+    ):wait()
+    if result.code == 0 then
+      print("Successfully installed " .. repo .. " at " .. path .. ".")
+    else
+      error("Error [" .. result.code .. "]: " .. result.stderr)
+    end
   end
 end
 
 local rig_plugin_dir = vim.fn.stdpath("data") .. "/lazy/rig.nvim"
 fetch("codebeige/rig.nvim", rig_plugin_dir)
+dofile(rig_plugin_dir .. "/build.lua")
+
 vim.opt.rtp:prepend(rig_plugin_dir)
 require("rig").setup()
 
 -- we are all set, you can safely require fennel code here
-require('config.base').setup()
+require("config.base").setup()
 
 -- load, configure, and update your plugins (including rig.nvim)
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 fetch("folke/lazy.nvim", lazypath)
-require('lazy').setup({
+require("lazy").setup({
   spec = {
     { import = "plugins" },
   },
