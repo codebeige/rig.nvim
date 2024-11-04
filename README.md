@@ -58,10 +58,13 @@ function fetch(repo, path)
 end
 
 local rig_plugin_dir = vim.fn.stdpath("data") .. "/lazy/rig.nvim"
-fetch("codebeige/rig.nvim", rig_plugin_dir)
-dofile(rig_plugin_dir .. "/build.lua")
-
+-- we are only fetching once, updates are managed by lazy.nvim
+if not vim.loop.fs_stat(rig_plugin_dir) then
+  fetch("codebeige/rig.nvim", rig_plugin_dir)
+  dofile(rig_plugin_dir .. "/build.lua")
+end
 vim.opt.rtp:prepend(rig_plugin_dir)
+
 require("rig").setup()
 
 -- we are all set, you can safely require fennel code here
@@ -76,6 +79,13 @@ require("lazy").setup({
   },
   checker = { enabled = true },
 })
+```
+
+```lua
+-- $XDG_CONFIG_HOME/nvim/lua/plugins/rig.nvim.lua
+
+-- add plugin lazy.nvim config for managing updates
+return "codebeige/rig.nvim"
 ```
 
 ### Configuration
