@@ -1,4 +1,4 @@
-# ⛵️ rig.nvim
+# 🪢 rig.nvim
 
 First-class [fennel][1] support inside [neovim][2].
 
